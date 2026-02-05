@@ -1,7 +1,7 @@
 <template>
   <div class="layout">
     <aside class="sidebar">
-      <router-link to="/dashboard">Dashboard</router-link>
+      <router-link to="/user/dashboard">Dashboard</router-link>
     </aside>
 
     <main>

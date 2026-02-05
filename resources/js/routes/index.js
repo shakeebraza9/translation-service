@@ -1,26 +1,37 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import { useAlertStore } from '@/stores/alertStore'
+
 
 import Layout from '@/views/Layouts/index.vue'
+import Login from '@/views/auth/Login.vue'
 import Dashboard from '@/views/dashboard/index.vue'
 import NotFound from '@/views/404.vue'
 
 const suburl = import.meta.env.VITE_SUB_URL || '/'
 
 const routes = [
+
   {
     path: '/',
+    name: 'login',
+    component: Login,
+  },
+
+
+  {
+    path: '/user',
     component: Layout,
+    meta: { requiresAuth: true },
     children: [
       {
-        path: 'dashboard',
+        path: 'dashboard', 
         name: 'dashboard',
         component: Dashboard,
-        meta: { requiresAuth: true },
       },
     ],
   },
+
+
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
@@ -35,23 +46,30 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const auth = useUserStore()
-  const alertStore = useAlertStore()
 
-  try {
-    const res = await auth.getProfile()
-    auth.user = res.user
-    auth.is_logged_in = true
-  } catch (e) {
-    auth.user = {}
-    auth.is_logged_in = false
-    localStorage.removeItem('auth_token')
+  if (!auth.checked) {
+    try {
+      const res = await auth.getProfile()
+      auth.user = res.user
+      auth.is_logged_in = true
+    } catch (e) {
+      auth.user = {}
+      auth.is_logged_in = false
+      localStorage.removeItem('auth_token')
+    }
+    auth.checked = true
   }
+
 
   if (to.meta.requiresAuth && !auth.is_logged_in) {
-    next('/login')
-  } else {
-    next()
+    return next('/') 
   }
+
+  if (to.name === 'login' && auth.is_logged_in) {
+    return next({ name: 'dashboard' })
+  }
+
+  next()
 })
 
 export default router
