@@ -74,8 +74,8 @@
             </div>
             
             <div class="mt-10 d-flex align-center gap-4">
-              <v-btn color="primary" size="large" rounded="lg" class="px-8 font-weight-bold shadow-primary">
-                Hire Me
+              <v-btn to="/contact" color="primary" size="large" rounded="lg" class="px-8 font-weight-bold shadow-primary">
+                Contact us
               </v-btn>
               <v-btn variant="text" color="white" prepend-icon="mdi-play-circle-outline">
                 Watch Portfolio

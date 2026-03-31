@@ -2,14 +2,13 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 
 
-import Layout from '@/views/Layouts/index.vue'
+
 import WebLayout from '@/views/web/Layouts/index.vue'
 import Projects from '@/views/web/projects.vue'
 import Contact from '@/views/web/contact.vue'
 import Blog from '@/views/web/BlogView.vue'
 import Home from '@/views/web/home.vue'
-import Login from '@/views/auth/Login.vue'
-import Dashboard from '@/views/dashboard/index.vue'
+import Login from '@/views/auth/login.vue'
 import NotFound from '@/views/404.vue'
 
 const suburl = import.meta.env.VITE_SUB_URL || '/'
@@ -39,17 +38,21 @@ const routes = [
         }
     ]
   },
-
+{
+    path: '/login', // <--- Error yahan tha, "/" lazmi hai
+    name: 'login',
+    component: Login,
+  },
 
   {
-    path: '/user',
-    component: Layout,
+    path: '/admin',
+    component: () => import('@/views/admin/layout/index.vue'),
     meta: { requiresAuth: true },
     children: [
       {
         path: 'dashboard', 
         name: 'dashboard',
-        component: Dashboard,
+        component: () => import('@/views/admin/Overview.vue'),
       },
     ],
   },
@@ -70,7 +73,8 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const auth = useUserStore()
 
-  if (!auth.checked) {
+  // 1. Profile fetch logic (Sirf ek baar jab app load ho)
+  if (!auth.checked && localStorage.getItem('auth_token')) {
     try {
       const res = await auth.getProfile()
       auth.user = res.user
@@ -79,17 +83,23 @@ router.beforeEach(async (to, from, next) => {
       auth.user = {}
       auth.is_logged_in = false
       localStorage.removeItem('auth_token')
+    } finally {
+      auth.checked = true // Hamesha true karein taake loop na bane
     }
+  } else {
     auth.checked = true
   }
 
-
+  // 2. Auth Guard: Agar page ko login chahiye aur user logged in nahi hai
   if (to.meta.requiresAuth && !auth.is_logged_in) {
-    return next('/') 
+    return next({ name: 'login' }) // Ya '/' jo aap chahein
   }
 
+  // 3. Guest Guard: Agar user logged in hai aur login page par ja raha hai
+  // Note: 'dashboard' route ka active hona zaroori hai
   if (to.name === 'login' && auth.is_logged_in) {
-    return next({ name: 'dashboard' })
+    // Check karein ke dashboard route exists karta hai ya nahi
+    return next('/') 
   }
 
   next()
