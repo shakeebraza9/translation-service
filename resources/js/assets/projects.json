@@ -1,0 +1,77 @@
+[
+  {
+    "id": 1,
+    "slug": "the-rare-perfumes",
+    "title": "The Rare Perfumes",
+    "category": "Ecommerce website",
+    "description": "A modern and fully functional e-commerce perfume store with product management, shopping cart, and secure checkout experience.",
+    "images": "/therareperfumes/thumnail.png",
+    "viewLink": "https://therareperfumes.online/",
+    "developedBy": "Shakeeb Raza",
+    "author": "Muhammad Shakeeb Raza",
+    "gallery": {
+      "Home": "/therareperfumes/home.png",
+      "Shop Page": "/therareperfumes/shop.png",
+      "Details Page": "/therareperfumes/detail.png",
+      "Checkout Page": "/therareperfumes/Checkout.png",
+      "Admin Panel Create Product": "/therareperfumes/createproduct.png",
+      "Admin Panel List Product": "/therareperfumes/list.png"
+    },
+    "technologies": "HTML,CSS,Laravel,MYSQL,Jquery,AJAX",
+    "longDescription": "Designed and developed a complete e-commerce solution for a perfume brand. The platform includes a dynamic product catalog, advanced product filtering, shopping cart functionality, and a smooth checkout process. Implemented an admin panel for product management, order handling, and content updates. Focused on responsive design, performance optimization, and user-friendly UI to ensure a seamless shopping experience across all devices."
+  },
+  {
+    "id": 2,
+    "slug": "langkawibook-motor",
+    "title": "LangkawiBook Motor",
+    "category": "Business website",
+    "description": "A business-focused vehicle booking and tourism platform designed to simplify rentals and customer interactions.",
+    "images": "/langkawibook/thumnail.png",
+    "viewLink": "https://www.langkawibook.my/",
+    "developedBy": "Shakeeb Raza",
+    "author": "Muhammad Shakeeb Raza",
+    "technologies": "HTML,CSS,Laravel,MYSQL,Jquery,AJAX",
+    "gallery": {
+      "Home": "/langkawibook/home.png",
+      "Shop Page": "/langkawibook/carfind.png",
+      "Attractions Page": "/langkawibook/attractions.png",
+      "Attractions Details": "/langkawibook/attractions_details.png"
+    },
+    "longDescription": "Developed a comprehensive business website for vehicle rentals and tourism services. The system allows users to explore vehicles, search and filter options, and view attractions with detailed information. Built using Laravel with a strong backend structure and a responsive frontend. Emphasis was placed on usability, clean design, and performance to support both local and international users."
+  },
+  {
+    "id": 3,
+    "slug": "gareeb-nawaaz-surgical-ltd",
+    "title": "GAREEB NAWAAZ SURGICAL LTD",
+    "category": "Business website",
+    "description": "A corporate website built to represent a surgical manufacturing company with structured product and category management.",
+    "images": "/gareeb/thumnail.png",
+    "viewLink": "",
+    "gallery": {
+      "Home": "/gareeb/home.png",
+      "Category Page": "/gareeb/Category.png"
+    },
+    "developedBy": "Shakeeb Raza",
+    "author": "Muhammad Shakeeb Raza",
+    "technologies": "HTML,CSS,Laravel,Google Sheet,Jquery,AJAX",
+    "longDescription": "Created a professional business website for a surgical instruments company. The project includes category-based product listings, dynamic content management, and Google Sheet integration for easy data handling. Focused on simplicity, clarity, and maintainability while ensuring the platform effectively represents the brand and its product offerings."
+  },
+  {
+    "id": 4,
+    "slug": "pikachudeals",
+    "title": "Pikachudeals",
+    "category": "Coupon website",
+    "description": "A coupon and deals platform designed to showcase discounts, offers, and promotional content.",
+    "images": "/pikachudeals/thumnail.png",
+    "viewLink": "https://security.example.com",
+    "gallery": {
+      "Home": "/pikachudeals/home.png",
+      "About Us Page": "/pikachudeals/abourus.png",
+      "Category Page": "/pikachudeals/category.png"
+    },
+    "developedBy": "Shakeeb Raza",
+    "author": "Muhammad Shakeeb Raza",
+    "technologies": "HTML 5,CSS 3,Javascript,Laravel,PHP,Jquery",
+    "longDescription": "Developed a coupon-based website that allows users to browse deals, offers, and categories with ease. Implemented a clean UI, dynamic content loading, and category-based filtering. The platform is optimized for performance and usability, making it easy for users to find relevant discounts while providing a scalable backend for future growth."
+  }
+]

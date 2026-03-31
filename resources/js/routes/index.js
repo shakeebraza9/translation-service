@@ -3,6 +3,11 @@ import { useUserStore } from '@/stores/userStore'
 
 
 import Layout from '@/views/Layouts/index.vue'
+import WebLayout from '@/views/web/Layouts/index.vue'
+import Projects from '@/views/web/projects.vue'
+import Contact from '@/views/web/contact.vue'
+import Blog from '@/views/web/BlogView.vue'
+import Home from '@/views/web/home.vue'
 import Login from '@/views/auth/Login.vue'
 import Dashboard from '@/views/dashboard/index.vue'
 import NotFound from '@/views/404.vue'
@@ -13,8 +18,26 @@ const routes = [
 
   {
     path: '/',
-    name: 'login',
-    component: Login,
+    component: WebLayout,
+    children: [
+        {
+          path: '', 
+          name: 'Home',
+          component: Home,
+        },{
+          path: 'projects', 
+          name: 'projects',
+          component: Projects,
+        },{
+          path:'contact',
+          name:'contact',
+          component:Contact,
+        },{
+          path:'blog',
+          name:'blog',
+          component:Blog,
+        }
+    ]
   },
 
 
