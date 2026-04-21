@@ -15,6 +15,7 @@ const routes = [
     children: [
       { path: '', name: 'Home', component: Home },
       { path: 'projects', name: 'projects', component: () => import('@/views/web/projects.vue') },
+      { path: 'project/:slug', name: 'projects-detail', component: () => import('@/views/web/project-detail.vue') },
       { path: 'contact', name: 'contact', component: () => import('@/views/web/contact.vue') },
       { path: 'blog', name: 'blog', component: () => import('@/views/web/BlogView.vue') },
     ]
