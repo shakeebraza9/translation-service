@@ -11,7 +11,7 @@
             Let's Build Something <span class="text-primary">Great</span>
           </h2>
           <p class="text-light_text_on mb-10 text-body-1">
-            Agar aapke paas koi project idea hai ya aap mujhse full-stack development (Laravel/Vue) ke bare mein baat karna chahte hain, toh niche diye gaye form ya social links ke zariye rabta karein.
+            {{ globalStore.getSetting('contact_text') || 'Agar aapke paas koi project idea hai toh rabta karein.' }}
           </p>
 
           <div class="d-flex flex-column gap-6">
@@ -21,7 +21,7 @@
               </v-avatar>
               <div>
                 <div class="text-caption text-primary font-weight-bold">Email Me</div>
-                <div class="text-h6 text-white">shakeebraza90@gmail.com</div>
+                <div class="text-h6 text-white">{{ globalStore.getSetting('email') || 'shakeebraza90@gmail.com' }}</div>
               </div>
             </div>
 
@@ -31,7 +31,7 @@
               </v-avatar>
               <div>
                 <div class="text-caption text-primary font-weight-bold">Location</div>
-                <div class="text-h6 text-white">Karachi, Pakistan</div>
+                <div class="text-h6 text-white">{{ globalStore.getSetting('location') || 'Karachi, Pakistan' }}</div>
               </div>
             </div>
           </div>
@@ -39,36 +39,35 @@
           <div class="mt-10">
             <div class="text-subtitle-2 text-white mb-4">Follow My Work</div>
             <div class="d-flex gap-3">
-              <v-btn icon="mdi-github" variant="tonal" color="white" class="mr-2"></v-btn>
-              <v-btn icon="mdi-linkedin" variant="tonal" color="primary" class="mr-2"></v-btn>
-              <v-btn icon="mdi-twitter" variant="tonal" color="info" class="mr-2"></v-btn>
+              <v-btn :href="globalStore.getSetting('github') || '#'" target="_blank" icon="mdi-github" variant="tonal" color="white" class="mr-2"></v-btn>
+              <v-btn :href="globalStore.getSetting('linkdin') || '#' " target="_blank" icon="mdi-linkedin" variant="tonal" color="primary" class="mr-2"></v-btn>
             </div>
           </div>
         </v-col>
 
         <v-col cols="12" md="7">
           <v-card class="contact-form-card pa-8" border="border" elevation="0">
-            <v-form @submit.prevent="submitForm">
+            <v-form @submit.prevent="formSubmit">
               <v-row>
                 <v-col cols="12" sm="6">
                   <v-text-field
+                    v-model="form.name"
                     label="Full Name"
                     variant="outlined"
                     color="primary"
                     bg-color="inputBg"
-                    persistent-placeholder
-                    placeholder="Ajoy Sarker"
+                    placeholder="Enter your name"
                     hide-details="auto"
                     class="mb-4"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="6">
                   <v-text-field
+                    v-model="form.email"
                     label="Email Address"
                     variant="outlined"
                     color="primary"
                     bg-color="inputBg"
-                    persistent-placeholder
                     placeholder="email@example.com"
                     hide-details="auto"
                     class="mb-4"
@@ -76,6 +75,7 @@
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
+                    v-model="form.subject"
                     label="Subject"
                     variant="outlined"
                     color="primary"
@@ -86,6 +86,7 @@
                 </v-col>
                 <v-col cols="12">
                   <v-textarea
+                    v-model="form.description"
                     label="How can I help you?"
                     variant="outlined"
                     color="primary"
@@ -97,6 +98,7 @@
                 </v-col>
                 <v-col cols="12">
                   <v-btn
+                    type="submit"
                     block
                     color="primary"
                     size="x-large"
@@ -104,6 +106,7 @@
                     elevation="8"
                     class="font-weight-bold"
                     prepend-icon="mdi-send-variant"
+                    :loading="loading"
                   >
                     Send Message
                   </v-btn>
@@ -117,11 +120,48 @@
   </v-container>
 </template>
 
-<script setup>
-const submitForm = () => {
-  // Logic to handle form submission (e.g., Axios call to Laravel backend)
-  console.log('Form Submitted');
-};
+<script>
+import General from '@/models/general.model';
+import { useGlobalSettingStore } from '@/stores/globalSetting'
+
+export default {
+  data() {
+    return {
+      globalStore: useGlobalSettingStore(),
+      loading: false,
+      form: {
+        name: "",
+        email: "",
+        subject: "",
+        description: ""
+      }
+    }
+  },
+  methods: {
+    async formSubmit() {
+      if (!this.form.email || !this.form.description) {
+        this.$alertStore.add('Please fill required fields', 'error');
+        return;
+      }
+
+      this.loading = true;
+      try {
+        await General.post("supportForm", this.form);
+        this.$alertStore.add('Message Sent Successfully', 'success');
+        
+        // Reset form
+        this.form = { name: "", email: "", subject: "", description: "" };
+      } catch (error) {
+        this.$alertStore.add(error, 'error');
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
+  async mounted() {
+    await this.globalStore.loadSettings();
+  }
+}
 </script>
 
 <style scoped>
