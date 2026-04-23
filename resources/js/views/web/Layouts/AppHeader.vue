@@ -7,7 +7,7 @@
     sticky
   >
     <v-app-bar-title class="font-weight-black text-white">
-      <span class="text-primary">Shakeeb</span>.DEV
+      <span class="text-primary">{{ globalStore.getSetting('website_name') || 'Shakeeb' }}</span>.DEV
     </v-app-bar-title>
 
     <v-spacer></v-spacer>
@@ -43,14 +43,34 @@
   </v-app-bar>
 </template>
 
-<script setup>
-const navLinks = [
-  { name: 'Home', path: '/' },
-  { name: 'Projects', path: '/projects' },
-  { name: 'Blog', path: '/blog' },
-  { name: 'Contact', path: '/contact' }
-]
+<script>
+import { useGlobalSettingStore } from '@/stores/globalSetting'
+
+export default {
+  data() {
+    return {
+      globalStore: useGlobalSettingStore(),
+      
+      navLinks: [
+        { name: 'Home', path: '/' },
+        { name: 'Projects', path: '/projects' },
+        { name: 'Blog', path: '/blog' },
+        { name: 'Contact', path: '/contact' }
+      ],
+    };
+  },
+
+  async mounted() {
+   await this.globalStore.loadSettings()
+  },
+
+  // methods: {
+
+  // }
+};
 </script>
+
+
 
 <style scoped>
 .nav-item {
@@ -61,37 +81,36 @@ const navLinks = [
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #B0B0B0; /* Normal state color */
+  color: #B0B0B0; 
   font-weight: 500;
   text-transform: capitalize;
   transition: color 0.3s ease;
 }
 
-/* Hover par koi underline nahi aayegi, sirf cursor pointer rahega */
 .nav-item:hover {
-  color: #FFFFFF; /* Halka sa highlight text ke liye, line nahi */
+  color: #FFFFFF; 
 }
 
-/* Underline Default State (Hidden) */
+
 .underline {
   position: absolute;
   bottom: 0;
   left: 50%;
   width: 0;
   height: 3px;
-  background-color: #0080FF; /* Sky Blue */
+  background-color: #0080FF; 
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateX(-50%);
   border-radius: 3px 3px 0 0;
 }
 
-/* ACTIVE STATE: Jab click ho jaye ya page open ho */
+
 .active-link {
-  color: #0080FF !important; /* Text color change to sky blue */
+  color: #0080FF !important; 
 }
 
 .active-link .underline {
-  width: 70%; /* Line sirf tab dikhegi jab link active hoga */
+  width: 70%; 
   box-shadow: 0 -2px 10px rgba(0, 128, 255, 0.3);
 }
 

@@ -15,7 +15,7 @@
             <div class="avatar-container">
               <v-avatar size="280" color="#0E1B2B" class="avatar-pulse-outline shadow-primary">
                 <v-img 
-                  :src="avatarImage" 
+                  :src="globalStore.getSetting('avatar') || avatarImage" 
                   alt="Ajoy Sarker"
                   cover
                   class="rounded-pill"
@@ -42,15 +42,15 @@
               </span>
               
               <h1 class="text-h2 font-weight-black mb-4 text-white">
-                I'm <span class="text-primary">Muhammad Shakeeb Raza</span>
+                I'm <span class="text-primary">{{ globalStore.getSetting('name') || 'Muhammad Shakeeb Raza' }}</span>
               </h1>
               
               <h3 class="text-h5 font-weight-medium text-danger mb-8 leading-relaxed">
-                Full-Stack Developer Specializing in Laravel & Vue.js Ecosystem. 
+                {{ globalStore.getSetting('exp') || 'Full-Stack Developer Specializing in Laravel & Vue.js Ecosystem.' }}
               </h3>
               
               <p class="text-body-1 text-light_text_on mb-10 max-w-600 mx-auto mx-md-0">
-               I am a passionate developer committed to building complex web applications that are simple and scalable. My top priorities are clean code and user-centric design.
+              {{ globalStore.getSetting('dsc') || '' }}
               </p>
 
               <div class="d-flex flex-wrap justify-center justify-md-start gap-4">
@@ -61,6 +61,7 @@
                   elevation="12" 
                   prepend-icon="mdi-download"
                   class="px-10 font-weight-bold shadow-primary"
+                  @click="downloadCV"
                 >
                   Download CV
                 </v-btn>
@@ -70,12 +71,17 @@
                   color="white" 
                   size="x-large" 
                   rounded="pill"
-                  to="/contact"
                   class="px-10 font-weight-bold border-white-op"
+                  prepend-icon="mdi-content-copy"
+                  @click="copyNumber"
                 >
-                  Contact Me
+                  {{ isCopied ? 'Copied!' : 'Copy Phone' }}
                 </v-btn>
               </div>
+
+    <v-snackbar v-model="snackbar" timeout="2000" color="success">
+      Phone number copied to clipboard!
+    </v-snackbar>
             </div>
           </v-col>
         </v-row>
@@ -84,9 +90,63 @@
   </v-sheet>
 </template>
 
-<script setup>
-import avatarImage from '@/assets/avatar.png'; // Aapka avatar image path
+<script>
+  import avatarImage from '@/assets/avatar.png'; 
+  import { useGlobalSettingStore } from '@/stores/globalSetting'
+  
+  export default {
+    data(){
+      return {
+        globalStore: useGlobalSettingStore(),
+        avatarImage: avatarImage,
+        isCopied: false,
+        snackbar: false
+      };
+    },
+    
+    async mounted() {
+      await this.globalStore.loadSettings()
+    },
+
+    methods: {
+      // 1. CV Download Logic
+      downloadCV() {
+        const cvPath = this.globalStore.getSetting('cv_url'); // Database mein key 'cv_url' honi chahiye
+        if (cvPath) {
+          const link = document.createElement('a');
+          link.href = cvPath;
+          link.setAttribute('download', 'Muhammad_shakeeb_raza.pdf'); // Browser ko download force karne ke liye
+          link.setAttribute('target', '_blank'); // Backup agar download na ho to naye tab mein khule
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          alert('CV path not found in settings!');
+        }
+      },
+
+      // 2. Phone Copy Logic
+      async copyNumber() {
+        const phone = this.globalStore.getSetting('contact'); 
+        if (phone) {
+          try {
+            await navigator.clipboard.writeText(phone);
+            this.isCopied = true;
+            this.snackbar = true;
+            setTimeout(() => {
+              this.isCopied = false;
+            }, 2000);
+          } catch (err) {
+            console.error('Failed to copy: ', err);
+          }
+        } else {
+          alert('Phone number not found in settings!');
+        }
+      }
+    }
+  };  
 </script>
+
 
 <style scoped>
 .min-vh-100 { min-height: 100vh; }
@@ -97,7 +157,7 @@ import avatarImage from '@/assets/avatar.png'; // Aapka avatar image path
 .gap-4 { gap: 16px; }
 
 .hero-wrapper {
-  background: #000E20 !important; /* Theme Surface Color */
+  background: #000E20 !important;
 }
 
 .mesh-gradient {
@@ -108,7 +168,7 @@ import avatarImage from '@/assets/avatar.png'; // Aapka avatar image path
   height: 100%;
   background-image: 
     radial-gradient(at 0% 0%, rgba(0, 128, 255, 0.1) 0, transparent 50%), 
-    radial-gradient(at 100% 100%, rgba(242, 18, 2, 0.05) 0, transparent 50%); /* Mixed with Danger Hint */
+    radial-gradient(at 100% 100%, rgba(242, 18, 2, 0.05) 0, transparent 50%); 
   z-index: 1;
 }
 
@@ -129,7 +189,7 @@ import avatarImage from '@/assets/avatar.png'; // Aapka avatar image path
 .shape-1 {
   width: 500px;
   height: 500px;
-  background: #0080FF; /* Primary */
+  background: #0080FF; 
   top: -150px;
   right: -100px;
 }
@@ -137,7 +197,7 @@ import avatarImage from '@/assets/avatar.png'; // Aapka avatar image path
 .shape-2 {
   width: 450px;
   height: 450px;
-  background: #f21202; /* Danger color from your theme for contrast */
+  background: #f21202; 
   bottom: -150px;
   left: -100px;
   animation-delay: -7s;
@@ -148,7 +208,7 @@ import avatarImage from '@/assets/avatar.png'; // Aapka avatar image path
   100% { transform: translate(120px, 80px) scale(1.2); }
 }
 
-/* Avatar Specific Styling */
+
 .avatar-container {
   position: relative;
   z-index: 3;
@@ -156,7 +216,7 @@ import avatarImage from '@/assets/avatar.png'; // Aapka avatar image path
 
 .avatar-pulse-outline {
   position: relative;
-  border: 10px solid #000E20 !important; /* Theme Surface Color */
+  border: 10px solid #000E20 !important; 
 }
 
 /* Moving Outline Effect */
@@ -167,7 +227,7 @@ import avatarImage from '@/assets/avatar.png'; // Aapka avatar image path
   left: -10px;
   right: -10px;
   bottom: -10px;
-  border: 3px solid #0080FF; /* Primary */
+  border: 3px solid #0080FF; 
   border-radius: 50%;
   opacity: 0.8;
   animation: avatar-pulse 2s infinite cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -186,10 +246,10 @@ import avatarImage from '@/assets/avatar.png'; // Aapka avatar image path
   position: absolute;
   bottom: -10px;
   right: -20px;
-  background: #021830; /* Theme InputBg Color */
+  background: #021830; 
   padding: 8px 16px;
   border-radius: 30px;
-  border: 2px solid #343E4B; /* Theme Border Color */
+  border: 2px solid #343E4B; 
   z-index: 4;
 }
 

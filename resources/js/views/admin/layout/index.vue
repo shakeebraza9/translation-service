@@ -1,7 +1,6 @@
 <template>
   <v-app id="admin-dashboard" :theme="currentTheme">
     
-    <!-- SIDEBAR -->
     <v-navigation-drawer
       v-model="drawer"
       app
@@ -10,31 +9,24 @@
       color="surface"
       class="border-right"
     >
-      
-      <!-- USER INFO -->
       <v-list-item class="pa-6">
-        
         <template #prepend>
           <v-avatar size="48" color="primary">
             <v-img :src="avatarImage" />
           </v-avatar>
         </template>
-
         <template #default>
           <v-list-item-title class="text-h6 font-weight-bold text-white">
             Ajoy Sarker
           </v-list-item-title>
-
           <v-list-item-subtitle class="text-primary">
             Super Admin
           </v-list-item-subtitle>
         </template>
-
       </v-list-item>
 
       <v-divider class="mx-4 opacity-10" />
 
-      <!-- MENU -->
       <v-list nav class="pa-4">
         <v-list-item
           v-for="item in menuItems"
@@ -48,9 +40,24 @@
         />
       </v-list>
 
+      <template v-slot:append>
+        <div class="pa-4">
+          <v-btn
+            block
+            color="error"
+            variant="tonal"
+            prepend-icon="mdi-logout"
+            class="text-capitalize font-weight-bold"
+            :loading="loading"
+            @click="handleLogout"
+          >
+            Logout Session
+          </v-btn>
+        </div>
+      </template>
+
     </v-navigation-drawer>
 
-    <!-- TOP BAR -->
     <v-app-bar flat border color="surface" height="72">
       <v-toolbar-title>
         Dashboard /
@@ -58,7 +65,6 @@
       </v-toolbar-title>
     </v-app-bar>
 
-    <!-- CONTENT -->
     <v-main class="bg-background">
       <router-view />
     </v-main>
@@ -71,9 +77,11 @@ import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import avatarImage from '@/assets/avatar.png'
-
+// API call ke liye model import karein (agar aapne banaya hua hai)
+import General from '@/models/general.model' 
 
 const drawer = ref(true)
+const loading = ref(false)
 const currentTheme = ref('adminDark')
 
 const router = useRouter()
@@ -90,11 +98,23 @@ const activePageName = computed(() => {
   return route.name || 'Overview'
 })
 
-const logout = () => {
-  localStorage.removeItem('auth_token')
-  userStore.user = {}
-  userStore.is_logged_in = false
-  router.push('/login')
+// Logout Logic with API call
+const handleLogout = async () => {
+  loading.value = true
+  try {
+    // 1. API Call (Laravel sanctum/api logout endpoint)
+    await General.post('/logout') 
+  } catch (error) {
+    console.error("Logout API failed, but clearing local session anyway.", error)
+  } finally {
+    // 2. Clear Local Data (Hamesha execute hoga)
+    localStorage.removeItem('auth_token')
+    userStore.user = {}
+    userStore.is_logged_in = false
+    
+    loading.value = false
+    router.push('/login')
+  }
 }
 </script>
 

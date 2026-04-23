@@ -4,11 +4,12 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Master\BlogCategoryController;
 use App\Http\Controllers\Api\Master\BlogController;
 use App\Http\Controllers\Api\Master\GlobalSettingsController;
+use App\Http\Controllers\Api\Master\ProjectController;
 
 
 // Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
+Route::get('/setting', [GlobalSettingsController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/profile', [AuthController::class, 'profile']);
@@ -17,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('blogCategory',BlogCategoryController::class);
         Route::resource('blog',BlogController::class);
         Route::resource('settings',GlobalSettingsController::class);
+        Route::resource('projects', ProjectController::class);
 
     });
 });
