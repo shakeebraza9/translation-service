@@ -33,8 +33,8 @@
     <v-divider vertical inset class="hidden-sm-and-down mx-4" style="opacity: 0.1"></v-divider>
 
     <div class="d-flex align-center gap-2">
-      <v-btn icon="mdi-github" variant="text" color="white" href="#"></v-btn>
-      <v-btn icon="mdi-linkedin" variant="text" color="primary" href="#"></v-btn>
+      <v-btn icon="mdi-github" variant="text" color="white" :href=" globalStore.getSetting('github') || '#' "></v-btn>
+      <v-btn icon="mdi-linkedin" variant="text" color="primary" :href=" globalStore.getSetting('linkdin') || '#' "></v-btn>
     </div>
 
     <v-btn icon class="hidden-md-and-up ml-2" color="primary">

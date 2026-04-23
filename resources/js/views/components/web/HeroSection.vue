@@ -16,7 +16,7 @@
               <v-avatar size="280" color="#0E1B2B" class="avatar-pulse-outline shadow-primary">
                 <v-img 
                   :src="globalStore.getSetting('avatar') || avatarImage" 
-                  alt="Ajoy Sarker"
+                  alt="Muhammad Shakeeb Raza"
                   cover
                   class="rounded-pill"
                 >
@@ -38,7 +38,7 @@
           <v-col cols="12" md="7" class="text-left-md text-center-sm pl-md-10">
             <div>
               <span class="text-subtitle-1 text-primary font-weight-bold text-uppercase letter-spacing-2">
-                Discover My Journey
+                About Me
               </span>
               
               <h1 class="text-h2 font-weight-black mb-4 text-white">

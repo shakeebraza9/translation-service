@@ -5,11 +5,13 @@ use App\Http\Controllers\Api\Master\BlogCategoryController;
 use App\Http\Controllers\Api\Master\BlogController;
 use App\Http\Controllers\Api\Master\GlobalSettingsController;
 use App\Http\Controllers\Api\Master\ProjectController;
+use App\Http\Controllers\Api\PageController;
 
 
 // Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/setting', [GlobalSettingsController::class, 'index']);
+Route::post('/supportForm',[PageController::class,'supportForm']);
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/profile', [AuthController::class, 'profile']);

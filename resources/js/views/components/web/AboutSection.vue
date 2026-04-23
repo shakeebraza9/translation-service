@@ -8,18 +8,13 @@
         <v-col cols="12" md="5" class="position-relative d-flex justify-center">
           <div class="image-wrapper">
             <v-card class="profile-card" border="border" elevation="0">
-              <v-img
-                :src="profileImg"
-                alt="Ajoy Sarker"
-                cover
-                class="rounded-lg"
-              >
+              <v-img :src="globalStore.getSetting('image') || profileImg" alt="Profile Image" cover class="rounded-lg">
                 <div class="image-overlay"></div>
               </v-img>
             </v-card>
             <div class="decorative-box bg-primary"></div>
           </div>
-        </v-col>
+        </v-col>  
 
         <v-col cols="12" md="7" class="pl-md-12">
           <div class="content-box">
@@ -28,48 +23,42 @@
             </span>
             
             <h2 class="text-h3 font-weight-black text-white mt-2 mb-4">
-              I'm <span class="text-primary">Muhammad Shakeeb Raza</span>
+              I'm <span class="text-primary">{{ globalStore.getSetting('name') || 'Muhammad Shakeeb Raza' }}</span>
             </h2>
             
             <h3 class="text-h5 font-weight-medium text-danger mb-6">
-              Full-Stack Developer | Laravel & Vue.js
+              {{ globalStore.getSetting('designation') || 'Full-Stack Developer | Laravel & Vue.js' }}
             </h3>
 
             <v-divider class="mb-6" style="opacity: 0.1;"></v-divider>
 
             <p class="text-body-1 text-light_text_on mb-8 leading-relaxed">
-                Full Stack Developer with 3+ years of real-world experience building fast,
-                secure, and user-friendly web applications. Strong grip on Laravel, Vue.js,
-                JavaScript, PHP, Node.js, Express, and Python, with solid experience in API
-                integration and database-driven systems. Worked on multiple live
-                projects including business, e-commerce, and security platforms.
-                Passionate about clean code, problem-solving, and delivering practical
-                solutions that actually work.
+               {{ globalStore.getSetting('detail_dsc') }}
             </p>
 
             <v-row class="mb-8">
               <v-col cols="6" sm="4">
                 <div class="stat-item">
-                  <div class="text-h4 font-weight-bold text-primary">3+</div>
+                  <div class="text-h4 font-weight-bold text-primary">{{ globalStore.getSetting('exp_years') || '3+' }}</div>
                   <div class="text-caption text-light_text_on">Years Exp.</div>
                 </div>
               </v-col>
               <v-col cols="6" sm="4">
                 <div class="stat-item">
-                  <div class="text-h4 font-weight-bold text-primary">20+</div>
+                  <div class="text-h4 font-weight-bold text-primary">{{ globalStore.getSetting('projects_count') || '20+' }}</div>
                   <div class="text-caption text-light_text_on">Projects Done</div>
                 </div>
               </v-col>
             </v-row>
             
             <div class="d-flex flex-wrap gap-2">
-              <v-chip v-for="skill in skills" :key="skill.name"
-                :color="skill.color"
+              <v-chip v-for="(skill, index) in dynamicSkills" :key="index"
+                :color="getRandomColor()"
                 variant="tonal"
                 class="font-weight-bold"
                 size="small"
               >
-                {{ skill.name }}
+                {{ skill.trim() }}
               </v-chip>
             </div>
             
@@ -88,19 +77,49 @@
   </v-container>
 </template>
 
-<script setup>
-import profileImg from "@/assets/profile.jpeg";
+<script>
+  import profileImg from "@/assets/profile.jpeg";
+  import { useGlobalSettingStore } from '@/stores/globalSetting'
+  
+  export default {
+    data(){
+      return {
+        globalStore: useGlobalSettingStore(),
+        profileImg: profileImg,
+        chipColors: ['primary', 'secondary', 'info', 'success', 'warning', 'error', 'orange', 'purple', 'cyan']
+      };
+    },
+    
+    computed: {
+      dynamicSkills() {
+        const skillsString = this.globalStore.getSetting('skills'); 
+        return skillsString ? skillsString.split(',') : [];
+      }
+    },
 
-const skills = [
-  { name: 'Laravel', color: 'danger' },
-  { name: 'PHP', color: 'success' },
-  { name: 'JavaScript', color: 'info' },
-  { name: 'Vue.js', color: 'success' },
-  { name: 'Vuetify', color: 'info' },
-  { name: 'MySQL', color: 'primary' },
-  { name: 'Web Scraping', color: 'warning' },
-  { name: 'Python', color: 'danger' }
-];
+    async mounted() {
+      await this.globalStore.loadSettings()
+    },
+
+    methods: {
+      getRandomColor() {
+        return this.chipColors[Math.floor(Math.random() * this.chipColors.length)];
+      },
+
+      downloadCV() {
+        const cvPath = this.globalStore.getSetting('cv_url');
+        if (cvPath) {
+          const link = document.createElement('a');
+          link.href = cvPath;
+          link.setAttribute('download', 'Muhammad_shakeeb_raza.pdf');
+          link.setAttribute('target', '_blank');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+    }
+  };  
 </script>
 
 <style scoped>
@@ -109,7 +128,7 @@ const skills = [
 .gap-4 { gap: 16px; }
 .gap-2 { gap: 8px; }
 
-/* Image Styling */
+
 .image-wrapper {
   position: relative;
   z-index: 2;
@@ -143,7 +162,7 @@ const skills = [
   opacity: 0.3;
 }
 
-/* Background Blobs */
+
 .shape-blob {
   position: absolute;
   border-radius: 50%;
@@ -155,7 +174,7 @@ const skills = [
 .shape-primary {
   width: 500px;
   height: 500px;
-  background: #0080FF; /* Primary */
+  background: #0080FF; 
   top: -10%;
   right: -10%;
 }
@@ -163,7 +182,7 @@ const skills = [
 .shape-danger {
   width: 400px;
   height: 400px;
-  background: #f21202; /* Danger */
+  background: #f21202;
   bottom: -10%;
   left: -10%;
 }
