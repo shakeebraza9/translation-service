@@ -2,7 +2,7 @@
   <v-container id="experience" fluid class="py-16 bg-surface">
     <v-container>
       <div class="text-center mb-12">
-        <span class="text-primary font-weight-bold text-uppercase letter-spacing-2">My Journey</span>
+        <span class="text-primary font-weight-bold text-uppercase letter-spacing-2">My Work Journey</span>
         <h2 class="text-h3 font-weight-black text-white mt-2">Work <span class="text-primary">Experience</span></h2>
       </div>
 

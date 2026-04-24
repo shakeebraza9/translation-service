@@ -8,6 +8,10 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Validator;
 use App\Mail\SupportFormMail;
 use Illuminate\Support\Facades\Mail;
+use App\Models\Project;
+use App\Models\Blog;
+use Predis\Command\Container\FUNCTIONS;
+
 class PageController extends Controller
 {
 
@@ -53,7 +57,115 @@ class PageController extends Controller
 
 
     }
+    public function projectForm(Request $request)
+    {
 
+        $length = (int) $request->input('length', 10); 
+        $page   = (int) $request->input('page', 1);
+
+        $length = $length > 0 ? $length : 10;
+        $page   = $page > 0 ? $page : 1;
+
+        $offset = ($page - 1) * $length;
+
+        $query = Project::query()->with('galleries');
+
+        // 🔍 Search
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+        $count = (clone $query)->count();
+
+
+        $data = $query
+            ->orderByDesc('id')
+            ->skip($offset)
+            ->take($length)
+            ->get();
+  
+
+        return response()->json([
+            'recordsTotal' => $count,
+            'recordsFiltered' => $count,
+            'page' => $page,
+            'length' => $length,
+            'offset' => $offset,
+            'last_page' => ceil($count / $length),
+            'data' => $data,
+        ]);
+    }
+
+    public function blogs(Request $request)
+    {
+
+        $length = $request->input('length', 50);
+        $page   = $request->input('page', 1);
+        $offset = ($page - 1) * $length;
+
+        //Query
+        $query = Blog::query()->with('category', 'author');
+
+        //Filter
+        if($request->filled('search')) {
+                $query->where('title', 'like', '%'.$request->search.'%');
+        }
+        if($request->has('id') && $request->id != '') {
+            $query->where('id',$request->id);
+        }
+
+        $count = (clone $query)->count();
+        $data = $query->select([
+                    '*'
+                ])
+                ->skip($offset)
+                ->take($length)
+                ->orderByDesc('id')
+                ->get()
+                ->map(function($item){
+                    return $item;
+                });
+            
+        return response()->json([
+            'recordsTotal' => $count,
+            'recordsFiltered' => $count,
+            'page' => $page,
+            'offset' => $offset,
+            'last_page' => ceil($count / $length),
+            'data' => $data,
+        ]);
+
+    }
+    public function singleBlog($slug)
+    {
+        try {
+
+            $blog = Blog::with('category', 'author','details')
+                ->where('slug', $slug)
+                ->first();
+
+            // ❌ Not Found
+            if (!$blog) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Blog not found'
+                ], 404);
+            }
+
+            // ✅ Success
+            return response()->json([
+                'status' => true,
+                'data' => $blog
+            ], 200);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 
 
 }

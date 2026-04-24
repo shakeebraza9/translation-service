@@ -18,6 +18,7 @@ const routes = [
       { path: 'project/:slug', name: 'projects-detail', component: () => import('@/views/web/project-detail.vue') },
       { path: 'contact', name: 'contact', component: () => import('@/views/web/contact.vue') },
       { path: 'blog', name: 'blog', component: () => import('@/views/web/BlogView.vue') },
+      { path: 'blog/:slug', name: 'blog-detail', component: () => import('@/views/web/BlogDetailView.vue') },
     ]
   },
   {
