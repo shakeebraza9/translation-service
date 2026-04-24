@@ -95,6 +95,38 @@ class PageController extends Controller
         ]);
     }
 
+    public function singleProject($slug)
+{
+    try {
+
+        $project = Project::with('galleries')
+            ->where('slug', $slug)
+            ->first();
+
+        // ❌ Not Found
+        if (!$project) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Project not found'
+            ], 404);
+        }
+
+        // ✅ Success
+        return response()->json([
+            'status' => true,
+            'data' => $project
+        ], 200);
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
     public function blogs(Request $request)
     {
 

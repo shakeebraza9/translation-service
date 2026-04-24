@@ -13,6 +13,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/setting', [GlobalSettingsController::class, 'index']);
 Route::post('/supportForm',[PageController::class,'supportForm']);
 Route::get('/project',[PageController::class,'projectForm']);
+Route::get('/project/{slug}',[PageController::class,'singleProject']);
 Route::get('/blogs',[PageController::class,'blogs']);
 Route::get('/blogs/{slug}',[PageController::class,'singleBlog']);
 Route::middleware('auth:sanctum')->group(function () {

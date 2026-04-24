@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="pa-0 bg-background min-h-screen">
+  <v-container v-if="project" fluid class="pa-0 bg-background min-h-screen">
     
     <v-sheet height="100vh" color="#05070a" class="d-flex align-center position-relative overflow-hidden">
       <div class="glow-orb-top"></div>
@@ -9,22 +9,24 @@
             <v-btn variant="text" color="primary" prepend-icon="mdi-arrow-left" class="mb-8 blur-btn" @click="$router.back()">
               Portfolio
             </v-btn>
-            <h1 class="display-title mb-4">AUTOBILI <span class="gradient-text">LTD</span></h1>
+            <h1 class="display-title mb-4 uppercase">
+              {{ firstWord }} <span class="gradient-text">{{ remainingWords }}</span>
+            </h1>
             <p class="text-h5 text-grey-lighten-1 mb-10 max-w-600 font-weight-light">
-              A high-performance scraping engine that automates UK automotive auctions with precision and speed.
+              {{ project.meta_description || 'A high-performance solution built with precision and speed.' }}
             </p>
             
             <div class="d-flex flex-wrap gap-4 mb-12">
-              <v-btn size="x-large" color="primary" elevation="12" class="px-8 rounded-pill font-weight-bold" prepend-icon="mdi-rocket-launch" href="#" target="_blank">
+              <v-btn v-if="project.url" size="x-large" color="primary" elevation="12" class="px-8 rounded-pill font-weight-bold" prepend-icon="mdi-rocket-launch" :href="project.url" target="_blank">
                 Live Preview
               </v-btn>
-              <v-btn size="x-large" variant="outlined" color="white" class="px-8 rounded-pill font-weight-bold blur-btn" prepend-icon="mdi-github" href="#" target="_blank">
+              <v-btn v-if="project.github_link" size="x-large" variant="outlined" color="white" class="px-8 rounded-pill font-weight-bold blur-btn" prepend-icon="mdi-github" :href="project.github_link" target="_blank">
                 Source Code
               </v-btn>
             </div>
 
             <div class="d-flex flex-wrap gap-3">
-              <v-chip v-for="tag in ['Laravel 11', 'Vue 3', 'Selenium', 'PostgreSQL']" :key="tag" 
+              <v-chip v-for="tag in formatTags(project.tag)" :key="tag" 
                 variant="outlined" color="primary" class="text-uppercase font-weight-bold px-4">
                 {{ tag }}
               </v-chip>
@@ -35,9 +37,9 @@
             <div class="hero-visual-card">
               <div class="floating-code-card">
                 <v-icon color="primary" class="mr-2">mdi-xml</v-icon>
-                <span class="text-caption text-grey">Scraper.py running...</span>
+                <span class="text-caption text-grey">Project Module Active...</span>
               </div>
-              <v-img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=2070" cover class="rounded-xl border-accent"></v-img>
+              <v-img :src="project.image" cover class="rounded-xl border-accent shadow-24" aspect-ratio="1"></v-img>
             </div>
           </v-col>
         </v-row>
@@ -52,20 +54,16 @@
         <v-col cols="12" lg="8">
           <section class="mb-16">
             <h2 class="text-h3 font-weight-bold text-white mb-8 border-l-4 border-primary pl-6">Technical Concept</h2>
-            <p class="text-body-1 text-grey-lighten-2 line-height-2 mb-8 pr-lg-10">
-              Manual auction monitoring mein dealers ko kaafi loss ho raha tha. **AUTOBILI LTD** ne isay solve kiya by implementing a 
-              **headless browser architecture**. Humne customized scrapers develop kiye jo background job queues ke zariye data 
-              fetch karte hain aur user ko notification bhejte hain jab koi "Hot Deal" milti hai.
-            </p>
+            <div class="blog-content text-body-1 text-grey-lighten-2 line-height-2 mb-8 pr-lg-10" v-html="project.description"></div>
             
-            <v-row class="mt-8">
-              <v-col cols="12" sm="6" v-for="feat in features" :key="feat.title">
+            <v-row class="mt-8" v-if="project.details && project.details.length > 0">
+              <v-col cols="12" sm="6" v-for="section in project.details" :key="section.id">
                 <v-card border color="#0d1117" class="pa-8 rounded-xl h-100 feature-card shadow-lg">
                   <v-avatar color="rgba(0,128,255,0.1)" size="60" class="mb-6">
-                    <v-icon color="primary" size="30">{{ feat.icon }}</v-icon>
+                    <v-icon color="primary" size="30">{{ section.icon || 'mdi-code-tags' }}</v-icon>
                   </v-avatar>
-                  <h4 class="text-h6 text-white mb-3">{{ feat.title }}</h4>
-                  <p class="text-body-2 text-grey-lighten-1">{{ feat.desc }}</p>
+                  <h4 class="text-h6 text-white mb-3">{{ section.name }}</h4>
+                  <p class="text-body-2 text-grey-lighten-1">{{ section.description }}</p>
                 </v-card>
               </v-col>
             </v-row>
@@ -78,18 +76,18 @@
             
             <div class="mb-6">
               <div class="d-flex justify-space-between mb-2">
-                <span class="text-grey-darken-1">Framework</span>
-                <span class="text-white">Laravel 11 / Vue 3</span>
+                <span class="text-grey-darken-1">Category</span>
+                <span class="text-white">{{ project.category?.title || 'Web Development' }}</span>
               </div>
-              <v-progress-linear color="primary" model-value="95" height="4" rounded></v-progress-linear>
+              <v-progress-linear color="primary" model-value="100" height="4" rounded></v-progress-linear>
             </div>
 
-            <div class="mb-6">
+            <div class="mb-6" v-if="project.client">
               <div class="d-flex justify-space-between mb-2">
-                <span class="text-grey-darken-1">Database</span>
-                <span class="text-white">PostgreSQL</span>
+                <span class="text-grey-darken-1">Client</span>
+                <span class="text-white">{{ project.client }}</span>
               </div>
-              <v-progress-linear color="primary" model-value="88" height="4" rounded></v-progress-linear>
+              <v-progress-linear color="primary" model-value="100" height="4" rounded></v-progress-linear>
             </div>
 
             <v-divider class="my-6 border-opacity-25"></v-divider>
@@ -97,12 +95,12 @@
             <div class="d-flex align-center mb-4">
               <v-icon color="grey" class="mr-3">mdi-calendar-check</v-icon>
               <div>
-                <div class="text-caption text-grey">Completed</div>
-                <div class="text-white font-weight-bold">March 2026</div>
+                <div class="text-caption text-grey">Launch Date</div>
+                <div class="text-white font-weight-bold">{{ formatDate(project.date) }}</div>
               </div>
             </div>
 
-            <v-btn block color="white" variant="outlined" height="50" class="mt-8 font-weight-bold rounded-lg" prepend-icon="mdi-email-outline">
+            <v-btn block color="white" variant="outlined" height="50" class="mt-8 font-weight-bold rounded-lg" to="/contact">
               Hire for Similar Project
             </v-btn>
           </v-card>
@@ -114,33 +112,10 @@
       <v-container>
         <div class="text-center mb-16">
           <v-chip color="primary" variant="tonal" class="mb-4">PREVIEW MODE</v-chip>
-          <h2 class="text-h2 font-weight-black text-white">Full <span class="text-primary">Experience</span></h2>
+          <h2 class="text-h2 font-weight-black text-white">Project <span class="text-primary">Gallery</span></h2>
         </div>
 
-        <v-row justify="center" class="mb-16">
-          <v-col cols="12" md="10">
-            <div class="video-wrapper">
-              <v-hover v-slot="{ isHovering, props }">
-                <v-card v-bind="props" border color="black" class="rounded-xl overflow-hidden" elevation="24">
-                  <v-img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070" cover height="550" class="align-center justify-center">
-                    <v-btn icon size="80" color="primary" class="play-btn-main" href="#" target="_blank">
-                      <v-icon size="40">mdi-play</v-icon>
-                    </v-btn>
-                  </v-img>
-                  <v-toolbar color="rgba(13, 17, 23, 0.9)" flat>
-                    <v-toolbar-title class="text-subtitle-1 text-white font-weight-bold ml-4">
-                      <v-icon start color="red" size="18">mdi-circle</v-icon> Backend Automation Demo
-                    </v-toolbar-title>
-                    <v-spacer></v-spacer>
-                    <v-btn icon="mdi-share-variant" color="white"></v-btn>
-                  </v-toolbar>
-                </v-card>
-              </v-hover>
-            </div>
-          </v-col>
-        </v-row>
-
-        <v-row>
+        <v-row v-if="galleryImages.length > 0">
           <v-col v-for="(img, i) in galleryImages" :key="i" cols="12" sm="4">
             <v-card class="gallery-card rounded-xl border-1" border @click="openGallery(i)">
               <v-img :src="img" cover height="280"></v-img>
@@ -150,6 +125,9 @@
               </div>
             </v-card>
           </v-col>
+        </v-row>
+        <v-row v-else justify="center">
+           <p class="text-grey">No additional images available for this project.</p>
         </v-row>
       </v-container>
     </v-sheet>
@@ -162,29 +140,80 @@
     </v-dialog>
 
   </v-container>
+
+  <v-container v-else height="100vh" color="#05070a" class="d-flex align-center position-relative overflow-hidden">
+    <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+  </v-container>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<script>
+import General from '@/models/general.model';
 
-const dialog = ref(false);
-const selectedImg = ref(0);
+export default {
+  data() {
+    return {
+      project: null,
+      loading: false,
+      dialog: false,
+      selectedImg: 0,
+    }
+  },
+  computed: {
+    
+    firstWord() {
+      if (!this.project?.name) return '';
+      return this.project.name.split(' ')[0];
+    },
+    remainingWords() {
+      if (!this.project?.name) return '';
+      const parts = this.project.name.split(' ');
+      return parts.slice(1).join(' ');
+    },
 
-const features = [
-  { title: 'Selenium Automation', icon: 'mdi-robot-industrial', desc: 'Custom drivers for handling dynamic content and multi-step logins.' },
-  { title: 'Real-time Webhook', icon: 'mdi-lightning-bolt', desc: 'Instant notifications pushed to user dashboard via Socket.io.' },
-  { title: 'Stripe Integration', icon: 'mdi-credit-card-outline', desc: 'Automated subscription management and billing system.' },
-  { title: 'Data Encryption', icon: 'mdi-lock-check', desc: 'End-to-end encryption for sensitive auction access credentials.' }
-];
-
-const galleryImages = [
-  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2026',
-  'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070',
-  'https://images.unsplash.com/photo-1504868584819-f8e90526ef7d?q=80&w=2070'
-];
-
-const openGallery = (i) => { selectedImg.value = i; dialog.value = true; };
+    galleryImages() {
+      if (!this.project?.galleries) return [];
+      return this.project.galleries
+        .filter(d => d.image)
+        .map(d => d.image);
+    }
+  },
+  methods: {
+    async fetchProjectDetail() {
+      this.loading = true;
+      const slug = this.$route.params.slug;
+      try {
+        const response = await General.get(`project/${slug}`);
+        if (response.status) {
+          this.project = response.data;
+        }
+      } catch (error) {
+        console.error("Project Load Error:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    formatTags(tags) {
+      if (!tags) return [];
+      return typeof tags === 'string' ? tags.split(',') : tags;
+    },
+    formatDate(dateString) {
+      if (!dateString) return 'In Progress';
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long'
+      });
+    },
+    openGallery(i) {
+      this.selectedImg = i;
+      this.dialog = true;
+    }
+  },
+  mounted() {
+    this.fetchProjectDetail();
+  }
+}
 </script>
+
+
 
 <style scoped>
 /* Main Styles */
