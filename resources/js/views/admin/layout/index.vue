@@ -91,7 +91,7 @@ const userStore = useUserStore()
 const menuItems = [
   { title: 'Overview', icon: 'mdi-view-dashboard-outline', path: '/admin/dashboard' },
   { title: 'Blog Posts', icon: 'mdi-post-outline', path: '/admin/blog' },
-  { title: 'Projects', icon: 'mdi-post-outline', path: '/admin/projects' },
+  { title: 'Projects', icon: 'mdi-rocket-launch-outline', path: '/admin/projects' },
   { title: 'Settings', icon: 'mdi-account-cog-outline', path: '/admin/settings' },
 ]
 

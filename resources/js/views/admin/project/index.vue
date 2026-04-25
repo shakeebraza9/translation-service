@@ -135,7 +135,7 @@ export default {
     return {
       filter: {
         search: null,
-        length: 10,
+        length: 100,
         page: 1,
         offset: 0,
       },
