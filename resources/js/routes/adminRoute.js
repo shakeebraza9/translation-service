@@ -1,4 +1,7 @@
 import blog from "@/views/admin/blog/route"
+import project from "@/views/admin/project/route"
+import Gallery from "@/views/admin/projectgallery/route"
+import Settings from "@/views/admin/settings/route"
 
 export default [
     {
@@ -11,6 +14,9 @@ export default [
                 component: () => import('@/views/admin/Overview.vue'),
             },
             ...blog, 
+            ...project,
+            ...Gallery,
+            ...Settings
         ]
     },
 ]

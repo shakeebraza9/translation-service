@@ -24,7 +24,7 @@
         <v-col 
           v-for="project in projects" 
           :key="project.id" 
-          cols="12" md="4" sm="6"
+          cols="12" md="6" sm="6"
         >
           <v-card class="project-card h-full" border="border" color="surface">
             <div class="image-container">
@@ -55,8 +55,7 @@
               </div>
 
               <h3 class="text-h5 font-weight-bold text-white mb-2">{{ project.name }}</h3>
-              <p class="text-light_text_on text-body-2 line-clamp-3">
-                {{ project.description }}
+              <p class="text-light_text_on text-body-2 line-clamp-3" v-html="project.description">
               </p>
             </v-card-text>
 
@@ -182,7 +181,9 @@ export default {
   -webkit-box-orient: vertical;  
   overflow: hidden;
 }
-
+.project-img{
+  object-fit: contain !important;
+}
 .decor-line {
   position: absolute;
   top: 10%;

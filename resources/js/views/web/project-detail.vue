@@ -39,7 +39,7 @@
                 <v-icon color="primary" class="mr-2">mdi-xml</v-icon>
                 <span class="text-caption text-grey">Project Module Active...</span>
               </div>
-              <v-img :src="project.image" cover class="rounded-xl border-accent shadow-24" aspect-ratio="1"></v-img>
+              <v-img :src="project.image" contain class="rounded-xl border-accent shadow-24" aspect-ratio="1"></v-img>
             </div>
           </v-col>
         </v-row>

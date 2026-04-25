@@ -48,7 +48,7 @@
                 <v-img 
                   :src="project.image" 
                   height="250" 
-                  cover
+                  contain
                   :class="{ 'zoom-effect': isHovering }"
                 >
                   <v-fade-transition grow>

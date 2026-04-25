@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
 class ProjectController extends Controller
 {
     public function index(Request $request)
@@ -53,8 +54,8 @@ class ProjectController extends Controller
             'name' => 'required|string|max:255',
             'url' => 'nullable|url|max:255',
             'github_link' => 'nullable|url|max:255',
-            'technologies' => 'nullable|string',
-            'image' => 'nullable|string|max:255',
+            'technologies' => 'nullable', // flexible rakho
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'database' => 'nullable|string|max:255',
             'framework' => 'nullable|string|max:255',
             'description' => 'nullable|string',
@@ -64,15 +65,39 @@ class ProjectController extends Controller
             'author' => 'nullable|string|max:255',
         ]);
 
+        // ✅ Technologies FIX (array → comma string)
+        if ($request->has('technologies')) {
+            if (is_array($request->technologies)) {
+                $validated['technologies'] = implode(',', $request->technologies);
+            } else {
+                $validated['technologies'] = $request->technologies;
+            }
+        }
+
+        // ✅ Slug
         $slug = Str::slug($validated['name']);
-        $count = Project::where('slug', 'LIKE', "{$slug}%")->count();
-        if ($count > 0) {
-            $slug = $slug . '-' . ($count + 1);
+        $originalSlug = $slug;
+        $i = 1;
+
+        while (Project::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $i++;
         }
 
         $validated['slug'] = $slug;
-        $validated['developed_by'] = $validated['developed_by'] == NULL ?? "Muhammad Shakeeb Raza";
-        $validated['author'] = $validated['author'] == NULL ?? "Muhammad Shakeeb Raza";
+
+        // ✅ Default values
+        $validated['developed_by'] = $validated['developed_by'] ?? "Muhammad Shakeeb Raza";
+        $validated['author'] = $validated['author'] ?? "Muhammad Shakeeb Raza";
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+
+            $imageName = time() . '_' . $image->getClientOriginalName();
+
+            $image->move(public_path('uploads/project'), $imageName);
+
+            $validated['image'] = env('APP_URL_IMAGE') . '/uploads/project/' . $imageName;
+        }
 
         $project = Project::create($validated);
 
@@ -85,14 +110,42 @@ class ProjectController extends Controller
 
     public function show($id)
     {
-        $project = Project::with('galleries')->findOrFail($id);
-        return response()->json($project);
+        try {
+            $project = Project::findOrFail($id);
+
+            // ✅ Technologies array → comma separated string
+            if (!empty($project->technologies)) {
+                if (is_array($project->technologies)) {
+                    $project->technologies = implode(',', $project->technologies);
+                } else {
+                    // agar already string hai to safe raho
+                    $project->technologies = $project->technologies;
+                }
+            }
+
+            return response()->json([
+                'message' => 'Project fetched successfully',
+                'data' => $project
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+
+            return response()->json([
+                'message' => 'Project not found'
+            ], 404);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
 
     public function update(Request $request, $id)
     {
-    
         try {
 
             $project = Project::findOrFail($id);
@@ -101,8 +154,8 @@ class ProjectController extends Controller
                 'name' => 'required|string|max:255',
                 'url' => 'nullable|url|max:255',
                 'github_link' => 'nullable|url|max:255',
-                'technologies' => 'nullable|string',
-                'image' => 'nullable|string|max:255',
+                'technologies' => 'nullable',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
                 'database' => 'nullable|string|max:255',
                 'framework' => 'nullable|string|max:255',
                 'description' => 'nullable|string',
@@ -112,7 +165,6 @@ class ProjectController extends Controller
                 'author' => 'nullable|string|max:255',
             ]);
 
-    
             if ($validator->fails()) {
                 return response()->json([
                     'message' => 'Validation failed',
@@ -122,6 +174,16 @@ class ProjectController extends Controller
 
             $validated = $validator->validated();
 
+            // ✅ Technologies array fix
+            if ($request->has('technologies')) {
+                if (is_array($request->technologies)) {
+                    $validated['technologies'] = implode(',', $request->technologies);
+                } else {
+                    $validated['technologies'] = $request->technologies;
+                }
+            }
+
+            // ✅ Slug update if name changed
             if ($project->name !== $validated['name']) {
                 $baseSlug = Str::slug($validated['name']);
                 $slug = $baseSlug;
@@ -135,6 +197,22 @@ class ProjectController extends Controller
                 }
 
                 $validated['slug'] = $slug;
+            }
+
+            // ✅ Image Upload (public folder)
+            if ($request->hasFile('image')) {
+
+                // 🔥 Old image delete
+                if ($project->image && File::exists(public_path($project->image))) {
+                    File::delete(public_path($project->image));
+                }
+
+                $image = $request->file('image');
+                $imageName = time() . '_' . $image->getClientOriginalName();
+
+                $image->move(public_path('uploads/project'), $imageName);
+
+                $validated['image'] = 'uploads/project/' . $imageName;
             }
 
             $project->update($validated);

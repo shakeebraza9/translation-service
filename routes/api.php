@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Master\BlogCategoryController;
 use App\Http\Controllers\Api\Master\BlogController;
 use App\Http\Controllers\Api\Master\GlobalSettingsController;
 use App\Http\Controllers\Api\Master\ProjectController;
+use App\Http\Controllers\Api\Master\ProjectGalleryController;
 use App\Http\Controllers\Api\PageController;
 
 
@@ -25,6 +26,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('blog',BlogController::class);
         Route::resource('settings',GlobalSettingsController::class);
         Route::resource('projects', ProjectController::class);
+
+
+        Route::prefix('project-gallery')->group(function () {
+            Route::post('/', [ProjectGalleryController::class, 'store']);
+            Route::get('/{project_id}', [ProjectGalleryController::class, 'index']);
+            Route::post('/update/{id}', [ProjectGalleryController::class, 'update']);
+            Route::delete('/{id}', [ProjectGalleryController::class, 'destroy']);
+        });
 
     });
 });

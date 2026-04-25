@@ -78,7 +78,7 @@ class PageController extends Controller
 
 
         $data = $query
-            ->orderByDesc('id')
+            ->orderByDesc('date')
             ->skip($offset)
             ->take($length)
             ->get();
